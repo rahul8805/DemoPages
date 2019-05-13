@@ -30,6 +30,11 @@
         document.getElementById("y").innerHTML = pageY;
       }
 
+      function onscrollhandler(event) {
+        document.getElementById("scrolly").innerHTML = window.scrollY;
+        document.getElementById("scrollx").innerHTML = window.scrollX;
+      }
+
       function hang() {
         var now = (new Date()).getTime();
 
@@ -53,18 +58,21 @@
 
     </script>
   </head>
-  <body>
+  <body onscroll="onscrollhandler(event);">
     <div style="position: fixed; left:0px; right:0px; padding: 10px;">
       Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
+      ScrollTop:  <span id="scrolly">0</span><br />
+      ScrollLeft: <span id="scrollx">0</span><br />
       <button onclick="startIntermittentHangs()">Induce main thread jank.</button>
       <button onclick="stopHangs()">Stop jank.</button><br /><br />
       <div id="expander" style="height:100px;width:150px;border: 5px solid;">Main thread animation.</div><br />
       <div style="width: 500px; height: 150px; background-color: #ffffff;">
       <ul>
-        <li>Must be on Chrome Canary 75.0.3769.0 or higher for this to work.</li>
-        <li>Click on "Induce main thread jank" and try to scroll by clicking repeatedly on the scrollbar arrows. Notice that the scrolling is extremely janky.</li>
-        <li>Now enable "Compositor threaded scrollbar scrolling" from about:flags and try to scroll by clicking repeatedly on the scrollbar arrows (thumb drag and
-        arrow press-and-hold is not yet implemented).</li>
+        <li>Must be on Chrome Canary 76.0.3793.0 or higher for this to work.</li>
+        <li>Click on "Induce main thread jank" and try to scroll by dragging the thumb (or by clicking repeatedly on the scrollbar arrows).
+            Notice that the scrolling is extremely janky.</li>
+        <li>Now enable "Compositor threaded scrollbar scrolling" from about:flags and try the same. (Please note that arrow press-and-hold
+            is not yet implemented).</li>
       </ul>
       </div>
     </div>
