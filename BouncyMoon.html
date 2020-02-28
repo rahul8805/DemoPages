@@ -177,22 +177,23 @@
       <button onclick="stopBounce()">Stop animation.</button><br />
       <button onclick="startIntermittentHangs()">Induce main thread jank.</button>
       <button onclick="stopHangs()">Stop jank.</button><br /><br />
-      <div id="hint"> 
-        <p>This is a demonstration of offloading scrollbar interactions to the compositor thread.</p>
-        <p>In chromium, scrolling using the scrollbar traditionally happens on the main thread.
+      <div id="hint">
+        <p>Note that this feature is now turned ON by default in Chrome Canary 82.0.4072.0 and newer builds.</p>
+        <p>This is a demonstration of scrollbar performance improvements.</p>
+        <p>In Chromium, scrolling using the scrollbar traditionally used to happen on the main thread.
            You can verify this by doing the following:
           <ol>
-            <li>Go to about:flags</li>
-            <li>Verify that the flag "Compositor threaded scrollbar scrolling" is disabled</li>
+            <li>Go to about:flags.</li>
+            <li>Set the flag "Compositor threaded scrollbar scrolling" to "Disabled".</li>
             <li>Restart the browser."</li>
-            <li>Click on "Start animation."</li>
+            <li>Click on "Start animation." (Note that this is just for visual confirmation that the main thread is hanging).</li>
             <li>Click on "Induce main thread jank."</li>
             <li>Click on the scrollbar thumb and drag it.</li>
           </ol>
         </p>
         <p>Notice that the scrolling is "janky" because the main thread is intermittently hanging.</p>
-        <p>With the feature turned on, you'll notice that scrolling is much smoother because it now happens on
-         the compositor thread. You can verify this by repeating the above steps with the flag enabled (at Step #2).
+        <p>Next, change the flag to "Enabled" (or to "Default" if you're on a build newer than 82.0.4072.0) and repeat steps 3 through 6, you'll notice that scrolling is much smoother because it now happens on
+         the compositor thread.
         </p>
         <a href="https://groups.google.com/a/chromium.org/forum/#!msg/blink-dev/hwZCeiK4wR8/99UGx0yxCgAJ" target="_blank">Intent to implement.</a><br />
         <a href="https://docs.google.com/document/d/1JqykSXnCkqwA1E3bUhhIi-IgEvM9HZdKtIu_S4Ncm6o/edit?usp=sharing" target="_blank">Design doc.</a>
