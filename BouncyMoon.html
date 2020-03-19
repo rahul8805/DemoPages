@@ -156,7 +156,7 @@
       <button onclick="startIntermittentHangs()">Induce main thread jank.</button>
       <button onclick="stopHangs()">Stop jank.</button><br /><br />
       <div id="hint">
-        <p>Note that this feature is now turned ON by default in Chrome Canary 82.0.4072.0 and newer builds.</p>
+        <p>Note that this feature is now turned ON by default in Chromium master. So any Chrome Canary build newer than 82.0.4072.0 or Microsoft Edge build newer than 82.0.446.0 will have it ON be default. If you're on an older build, you can always manually flip the flag and try it out !</p>
         <p>This is a demonstration of scrollbar performance improvements.</p>
         <p>In Chromium, scrolling using the scrollbar traditionally used to happen on the main thread.
            You can verify this by doing the following:
@@ -170,7 +170,7 @@
           </ol>
         </p>
         <p>Notice that the scrolling is "janky" because the main thread is intermittently hanging.</p>
-        <p>Next, change the flag to "Enabled" (or to "Default" if you're on a build newer than 82.0.4072.0) and repeat steps 3 through 6, you'll notice that scrolling is much smoother because it now happens on
+        <p>Next, change the flag to "Enabled" (or to "Default" if you're on a build newer than Chrome 82.0.4072.0 or newer than Edge 82.0.446.0) and repeat steps 3 through 6, you'll notice that scrolling is much smoother because it now happens on
          the compositor thread.
         </p>
         <a href="https://groups.google.com/a/chromium.org/forum/#!msg/blink-dev/hwZCeiK4wR8/99UGx0yxCgAJ" target="_blank">Intent to implement.</a><br />
