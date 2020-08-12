@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background: radial-gradient(rgba(2,0,36,1) 0%, rgba(11,233,159,1) 45%, rgba(0,212,255,1) 100%);
+        background-size:50px 50px,50px 50px;
+        background-position:0 0, 0 25px;
+      }
+    </style>
+    <script>
+      var last_scroll_time;
+      var last_scroll_delta_X;
+      var last_scroll_delta_Y;
+      var max_velocity_X;
+      var max_velocity_Y;
+      const max_allowed_speed = 10000;
+
+      function init() {
+        last_scroll_time = Date.now();
+        last_scroll_delta_X = window.scrollX;
+        last_scroll_delta_Y = window.scrollY;
+        max_velocity_X = max_velocity_Y = 0;
+      }
+      function onscrollhander() {
+        document.getElementById("offsetX").innerHTML = Math.round(window.scrollX);
+        document.getElementById("offsetY").innerHTML = Math.round(window.scrollY);
+
+        const time_elapsed_in_seconds = (Date.now() - last_scroll_time) / 1000;
+
+        const velocity_X = Math.round(Math.abs(window.scrollX - last_scroll_delta_X) / time_elapsed_in_seconds);
+        document.getElementById("velocityX").innerHTML = velocity_X;
+        max_velocity_X = velocity_X > max_velocity_X ? velocity_X : max_velocity_X;
+        document.getElementById("maxvelocityX").innerHTML = max_velocity_X;
+
+        const velocity_Y = Math.round(Math.abs(window.scrollY - last_scroll_delta_Y) / time_elapsed_in_seconds);
+        document.getElementById("velocityY").innerHTML = velocity_Y;
+        max_velocity_Y = velocity_Y > max_velocity_Y ? velocity_Y : max_velocity_Y;
+        document.getElementById("maxvelocityY").innerHTML = max_velocity_Y;
+
+        const scrolling_too_fast = velocity_X > max_allowed_speed || velocity_Y > max_allowed_speed;
+        document.getElementById("speed").innerHTML = scrolling_too_fast ? "Too fast." : "Acceptable";
+        document.getElementById("speed").style.backgroundColor = scrolling_too_fast ? "#f00" : "#0f0";
+
+        last_scroll_time = Date.now();
+        last_scroll_delta_X = window.scrollX;
+        last_scroll_delta_Y = window.scrollY;
+      }
+    </script>
+  </head>
+  <body onscroll="onscrollhander()" onload="init()">
+    <div style="position:fixed; top: 10px; left: 10px; background:#fff">
+      <div>Do a 2 finger scroll. Test passes if scrolling speed is acceptable.</div><br />
+      <div>Offset: (<span id="offsetX">0</span>, <span id="offsetY">0</span>)</div>
+      <div>Last calculated velocity (px/sec): (<span id="velocityX">0</span>, <span id="velocityY">0</span>)</div>
+      <div>Last known max velocity (px/sec): (<span id="maxvelocityX">0</span>, <span id="maxvelocityY">0</span>)</div>
+      <div>Scrolling speed: <span id="speed" style="background-color:#0f0">Acceptable</span></div>
+    </div>
+    <div style="height: 1000vh; width: 1000vw;"></div>
+  </body>
+</html>
