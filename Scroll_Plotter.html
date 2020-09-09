@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+<script>
+let x_axis = [];
+let offsets = [];
+let record = 0;
+let first_scroll_event_done = 0;
+let first_event_time = 0;
+
+function recordstart() {
+  record = 1;
+}
+
+function recordstop() {
+  record = 0;
+  first_scroll_event_done = 0;
+  first_event_time = 0;
+}
+
+function onscrollhandler() {
+  if(!record) return;
+
+  if(!first_scroll_event_done) {
+    x_axis = [];
+    offsets = [];
+    first_scroll_event_done = 1;
+    first_event_time = (new Date()).getTime();
+  }
+  offsets.push(document.scrollingElement.scrollTop);
+  x_axis.push((new Date()).getTime() - first_event_time);
+}
+
+function reset() {
+  x_axis = ['a', 'a'];
+  offsets = [0, 0];
+  record = 0;
+  first_scroll_event_done = 0;
+  first_event_time = 0;
+}
+
+function draw() {
+  if(record) {
+    alert("Stop recording to plot graph.");
+    return;
+  }
+
+  // Insufficient data. Just draw a flatline.
+  if(x_axis.length < 3) reset();
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: x_axis,
+      datasets: [{
+        label: 'Graph (based on last known dataset).',
+        data: offsets,
+        backgroundColor: "rgba(153,255,51,0.6)"
+      }]
+    }
+  });
+}
+</script>
+</head>
+<body onscroll="onscrollhandler()">
+  <div style="position: fixed">
+    <ul>Usage:
+	  <li>Click "Record start".</li>
+	  <li>Perform an animated scroll (using mousewheel, fling, arrow click etc).</li>
+	  <li>Click "Record stop".</li>
+	  <li>Click "Draw Graph".</li>
+	<button onclick="recordstart()">Record start</button>
+    <button onclick="recordstop()">Record stop</button>
+    <button onclick="draw()">Draw Graph</button>
+    <div class="container" style="width: 1000px; height: 1000px;">
+    <div>
+    <canvas id="myChart"></canvas>
+    </div>
+    </div>
+  </div>
+  <div style="height: 500vh; width: 500vw;"></div>
+</body>
+</html>
