@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <style>
+    body {
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      background: radial-gradient(rgba(2,0,36,1) 0%, rgba(11,233,159,1) 45%, rgba(0,212,255,1) 100%);
+      background-size:50px 50px,50px 50px;
+      background-position:0 0, 0 25px;
+    }
+  </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 <script>
 let x_axis = [];
@@ -33,7 +44,7 @@ function onscrollhandler() {
 }
 
 function reset() {
-  x_axis = ['a', 'a'];
+  x_axis = ['N/A', 'N/A'];
   offsets = [0, 0];
   record = 0;
   first_scroll_event_done = 0;
@@ -48,8 +59,8 @@ function draw() {
 
   // Insufficient data. Just draw a flatline.
   if(x_axis.length < 3) reset();
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var myChart = new Chart(ctx, {
+  var ctx = document.getElementById('graph_visual').getContext('2d');
+  var graph_visual = new Chart(ctx, {
     type: 'line',
     data: {
       labels: x_axis,
@@ -65,19 +76,22 @@ function draw() {
 </head>
 <body onscroll="onscrollhandler()">
   <div style="position: fixed">
+    <div style="background-color:#fff">
     <ul>Usage:
-	  <li>Click "Record start".</li>
-	  <li>Perform an animated scroll (using mousewheel, fling, arrow click etc).</li>
-	  <li>Click "Record stop".</li>
-	  <li>Click "Draw Graph".</li>
-	<button onclick="recordstart()">Record start</button>
+      <li>Click "Record start".</li>
+      <li>Perform an animated scroll (using mousewheel, fling, arrow click etc).</li>
+      <li>Click "Record stop".</li>
+      <li>Click "Draw Graph".</li>
+    </ul>
+    <button onclick="recordstart()">Record start</button>
     <button onclick="recordstop()">Record stop</button>
     <button onclick="draw()">Draw Graph</button>
-    <div class="container" style="width: 1000px; height: 1000px;">
+    <div class="container" style="width: 1000px; height: 550px;">
     <div>
-    <canvas id="myChart"></canvas>
+    <canvas id="graph_visual"></canvas>
     </div>
     </div>
+  </div>
   </div>
   <div style="height: 500vh; width: 500vw;"></div>
 </body>
