@@ -19,9 +19,35 @@ let offsets = [];
 let record = 0;
 let first_scroll_event_done = 0;
 let first_event_time = 0;
+let prev_offset = 0;
+
+function collectSamples() {
+  if(!record)
+    return;
+
+  if(prev_offset == document.scrollingElement.scrollTop) {
+    window.requestAnimationFrame(collectSamples);
+    return;
+  }
+
+  prev_offset = document.scrollingElement.scrollTop;
+  if(!first_scroll_event_done) {
+    x_axis = [];
+    offsets = [];
+    first_scroll_event_done = 1;
+    first_event_time = (new Date()).getTime();
+  }
+  offsets.push(document.scrollingElement.scrollTop);
+  x_axis.push((new Date()).getTime() - first_event_time);
+
+  window.requestAnimationFrame(collectSamples);
+}
 
 function recordstart() {
+  reset();
   record = 1;
+  prev_offset = document.scrollingElement.scrollTop;
+  window.requestAnimationFrame(collectSamples);
 }
 
 function recordstop() {
@@ -31,16 +57,7 @@ function recordstop() {
 }
 
 function onscrollhandler() {
-  if(!record) return;
 
-  if(!first_scroll_event_done) {
-    x_axis = [];
-    offsets = [];
-    first_scroll_event_done = 1;
-    first_event_time = (new Date()).getTime();
-  }
-  offsets.push(document.scrollingElement.scrollTop);
-  x_axis.push((new Date()).getTime() - first_event_time);
 }
 
 function reset() {
@@ -71,6 +88,8 @@ function draw() {
       }]
     }
   });
+
+  reset();
 }
 </script>
 </head>
@@ -93,6 +112,6 @@ function draw() {
     </div>
   </div>
   </div>
-  <div style="height: 500vh; width: 500vw;"></div>
+  <div style="height: 50000px; width: 500vw;"></div>
 </body>
 </html>
