@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html onpointermove="onpointermovehandler(event);">
+  <head>
+    <style>
+      body {
+        background-image:linear-gradient(0deg, transparent 50%, #aaa 50%),
+                         linear-gradient(90deg, #aaa 50%, #ccc 50%);
+        background-size:45px 45px,45px 45px;
+      }
+      #expander {
+        width: 100px;
+        height: 17px;
+        border-top: 1px solid red;
+        -webkit-animation: expandline 1.5s infinite;
+      }
+      #rotator {
+        width: 100px;
+        height: 100px;
+        border-top: 1px solid red;
+        -webkit-animation: rotation 4s infinite linear;
+      }
+
+    @keyframes rotation {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(359deg);
+      }
+    }
+      @-webkit-keyframes expandline{
+      0%   { width: 25%; }
+      100% { width: 75%; }
+    }
+    canvas {
+      margin: auto;
+    }
+    </style>
+    <script>
+      var hangTime = 1234;
+      var hangInterval = 500;
+
+      function onpointermovehandler(event) {
+        var pageX = Math.round(event.pageX);
+        var pageY = Math.round(event.pageY);
+        document.getElementById("x").innerHTML = pageX;
+        document.getElementById("y").innerHTML = pageY;
+      }
+
+      function onscrollhandler(event) {
+        document.getElementById("scrolly").innerHTML = window.scrollY;
+        document.getElementById("scrollx").innerHTML = window.scrollX;
+      }
+
+      var rotate_deg = 0;
+      function rotateImage() {
+        var r = document.getElementById('rotatorJS');
+        r.style.transform = 'rotate('+((rotate_deg++)%360)+'deg)';
+        window.requestAnimationFrame(rotateImage);
+      }
+
+      function fireJSAnimations() {
+        window.requestAnimationFrame(rotateImage);
+        window.requestAnimationFrame(calculateFPS);
+        main();
+      }
+
+      if (!window.requestAnimationFrame) {
+          window.requestAnimationFrame =
+          window.mozRequestAnimationFrame ||
+          window.webkitRequestAnimationFrame;
+      }
+
+      var t = [];
+      function calculateFPS(now) {
+          t.unshift(now);
+          if (t.length > 10) {
+              var t0 = t.pop();
+              var fps = Math.floor(1000 * 10 / (now - t0));
+              document.getElementById('fps').innerHTML = fps;
+          }
+          window.requestAnimationFrame(calculateFPS);
+      };
+
+      function hang() {
+        var now = (new Date()).getTime();
+
+        for (;;) {
+          if((new Date()).getTime() - now > hangTime) {
+            break;
+          }
+        }
+      }
+
+      // Hang for "hangTime" after every "hangInterval"
+      var g_intervalHandle;
+      function stopHangs() {
+        clearInterval(g_intervalHandle);
+      }
+
+      function startIntermittentHangs() {
+        stopHangs();
+        g_intervalHandle = setInterval(hang, hangInterval);
+      }
+
+    </script>
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-lessons-helper.js"></script>
+    <script src="https://webglfundamentals.org/webgl/lessons/resources/3d-math.js"></script>
+    <!-- vertex shader -->
+    <script id="2d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 a_position;
+    uniform mat4 u_worldViewProjection;
+
+    void main() {
+       gl_Position = u_worldViewProjection * a_position;
+    }
+    </script>
+    <!-- fragment shader -->
+    <script id="2d-fragment-shader" type="x-shader/x-fragment">
+    void main() {
+       gl_FragColor = vec4(0,0,0,1);
+    }
+    </script>
+    <script>
+    "use strict";
+
+    var m = ThreeDMath;
+
+    function main() {
+      var cubeVertices = [
+        -1, -1, -1,
+         1, -1, -1,
+         1,  1, -1,
+        -1,  1, -1,
+        -1, -1,  1,
+         1, -1,  1,
+         1,  1,  1,
+        -1,  1,  1,
+      ];
+      var indices = [
+        0, 1,
+        1, 2,
+        2, 3,
+        3, 0,
+        4, 5,
+        5, 6,
+        6, 7,
+        7, 4,
+        0, 4,
+        1, 5,
+        2, 6,
+        3, 7,
+      ];
+
+      var canvas = document.getElementById("c");
+      var gl = canvas.getContext("webgl");
+      if (!gl) {
+        alert("no webgl");
+        return;
+      }
+
+      var program = webglUtils.createProgramFromScripts(
+          gl, ["2d-vertex-shader", "2d-fragment-shader"]);
+      gl.useProgram(program);
+
+      var positionLoc = gl.getAttribLocation(program, "a_position");
+      var worldViewProjectionLoc =
+          gl.getUniformLocation(program, "u_worldViewProjection");
+
+      var buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array(cubeVertices),
+          gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(positionLoc);
+      gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 0, 0);
+
+      var buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+      gl.bufferData(
+          gl.ELEMENT_ARRAY_BUFFER,
+          new Uint16Array(indices),
+          gl.STATIC_DRAW);
+
+      function render(clock) {
+        clock *= 0.001;
+        var scale = 4;
+        webglUtils.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        var fieldOfView = Math.PI * 0.25;
+        var aspect = canvas.clientWidth / canvas.clientHeight;
+        var projection = m.perspective(fieldOfView, aspect, 0.0001, 500);
+        var radius = 5;
+        var eye = [
+            Math.sin(clock) * radius,
+            1,
+            Math.cos(clock) * radius,
+        ];
+        var target = [0, 0, 0];
+        var up = [0, 1, 0];
+        var view = m.lookAt(eye, target, up);
+
+        var worldViewProjection = m.multiplyMatrix(view, projection);
+        gl.uniformMatrix4fv(worldViewProjectionLoc, false, worldViewProjection);
+
+        gl.drawElements(gl.LINES, indices.length, gl.UNSIGNED_SHORT, 0);
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+    }
+
+    </script>
+  </head>
+  <body onscroll="onscrollhandler(event);" onload="fireJSAnimations();">
+    <div style="position: fixed; left:0px; right:0px; padding: 10px;">
+      Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
+      ScrollTop:  <span id="scrolly">0</span><br />
+      ScrollLeft: <span id="scrollx">0</span><br />
+      FPS: <span id="fps">0</span><br />
+      <button onclick="startIntermittentHangs()">Induce main thread jank.</button>
+      <button onclick="stopHangs()">Stop jank.</button><br /><br />
+      CSS (Main thread) animation.
+      <div id="expander" style="height:100px;width:150px;border: 5px solid;"></div><br /><br />
+      CSS (CC thread) animation.
+      <div id="rotator"  style="height:100px;width:100px;border: 5px solid;"></div><br /><br />
+      JS (CC thread) animation.
+      <div id="rotatorJS"  style="height:100px;width:100px;border: 5px solid;" onclick="rotateImage()"></div><br /><br />
+      WebGL 2d canvas.<br />
+      <canvas id="c" style="height:200px;width:200px;border: 5px solid;"></canvas>
+    </div>
+    <div style="width:500vw; height:100px"></div>
+    <div style="width:100px; height:500vh"></div>
+  </body>
+</html>
