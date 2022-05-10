@@ -2,11 +2,12 @@
 <html>
 <head>
   <style>
+    div, button {
+      margin: 5px;
+    }
     body {
       height: 100%;
       width: 100%;
-      padding: 0;
-      margin: 0;
       background: radial-gradient(rgba(2,0,36,1) 0%, rgba(11,233,159,1) 45%, rgba(0,212,255,1) 100%);
       background-size:50px 50px,50px 50px;
       background-position:0 0, 0 25px;
@@ -14,31 +15,43 @@
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 <script>
-let x_axis = [];
-let offsets = [];
+let x_axis_time = [];
+let y_axis_offsets = [];
 let record = 0;
 let first_scroll_event_done = 0;
 let first_event_time = 0;
-let prev_offset = 0;
+let prev_raf_offset = 0;
+let rAFCount = 0;
+let record_start_offset = 0;
 
 function collectSamples() {
   if(!record)
     return;
 
-  if(prev_offset == document.scrollingElement.scrollTop) {
+  if(prev_raf_offset == document.scrollingElement.scrollTop) {
     window.requestAnimationFrame(collectSamples);
     return;
   }
 
-  prev_offset = document.scrollingElement.scrollTop;
+  rAFCount++;
+
+  // This is necessary to weed out duplicate values. For eg: After you stop
+  // recording, rAF will still keep firing and will end up recording a bunch
+  // of duplicate values (i.e the offset at which the animation ends).
+  prev_raf_offset = document.scrollingElement.scrollTop;
+
   if(!first_scroll_event_done) {
-    x_axis = [];
-    offsets = [];
+    x_axis_time = [];
+    x_axis_time.push(0);
+
+    y_axis_offsets = [];
+    y_axis_offsets.push(0);
+
     first_scroll_event_done = 1;
     first_event_time = (new Date()).getTime();
   }
-  offsets.push(document.scrollingElement.scrollTop);
-  x_axis.push((new Date()).getTime() - first_event_time);
+  y_axis_offsets.push(Math.abs(record_start_offset - document.scrollingElement.scrollTop));
+  x_axis_time.push((new Date()).getTime() - first_event_time);
 
   window.requestAnimationFrame(collectSamples);
 }
@@ -46,7 +59,8 @@ function collectSamples() {
 function recordstart() {
   reset();
   record = 1;
-  prev_offset = document.scrollingElement.scrollTop;
+  prev_raf_offset = document.scrollingElement.scrollTop;
+  record_start_offset = document.scrollingElement.scrollTop;
   window.requestAnimationFrame(collectSamples);
 }
 
@@ -54,18 +68,19 @@ function recordstop() {
   record = 0;
   first_scroll_event_done = 0;
   first_event_time = 0;
-}
-
-function onscrollhandler() {
-
+  draw();
+  record_start_offset = 0;
 }
 
 function reset() {
-  x_axis = ['N/A', 'N/A'];
-  offsets = [0, 0];
+  x_axis_time = ['N/A', 'N/A'];
+  y_axis_offsets = [0, 0];
   record = 0;
   first_scroll_event_done = 0;
   first_event_time = 0;
+  rAFCount = 0;
+  document.getElementById('scrollDiv').innerHTML = 0;
+  document.getElementById('rAFDiv').innerHTML = 0;
 }
 
 function draw() {
@@ -74,44 +89,55 @@ function draw() {
     return;
   }
 
+  const delta = record_start_offset - document.scrollingElement.scrollTop;
+  document.getElementById('scrollDiv').innerHTML = Math.abs(Math.round(delta));
+  document.getElementById('rAFDiv').innerHTML = rAFCount;
+
   // Insufficient data. Just draw a flatline.
-  if(x_axis.length < 3) reset();
+  if(x_axis_time.length < 3) reset();
   var ctx = document.getElementById('graph_visual').getContext('2d');
   var graph_visual = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: x_axis,
+      labels: x_axis_time,
       datasets: [{
         label: 'Graph (based on last known dataset).',
-        data: offsets,
+        data: y_axis_offsets,
         backgroundColor: "rgba(153,255,51,0.6)"
       }]
     }
   });
+}
 
-  reset();
+function toggleRecordState() {
+  if(record) {
+    recordstop();
+    document.getElementById('toggleButton').innerHTML = "Start";
+  } else {
+    recordstart();
+    document.getElementById('toggleButton').innerHTML = "Stop";
+  }
 }
 </script>
 </head>
-<body onscroll="onscrollhandler()">
-  <div style="position: fixed">
+<body>
+  <div style="position: fixed;">
     <div style="background-color:#fff">
-    <ul>Usage directions:
-      <li>Click "Record start".</li>
-      <li>Perform an animated scroll (using mousewheel, fling, arrow click etc).</li>
-      <li>Click "Record stop".</li>
-      <li>Click "Draw Graph".</li>
-    </ul>
-    <button onclick="recordstart()">Record start</button>
-    <button onclick="recordstop()">Record stop</button>
-    <button onclick="draw()">Draw Graph</button>
-    <div class="container" style="width: 1000px; height: 550px;">
-    <div>
-    <canvas id="graph_visual"></canvas>
+      <ul>Usage directions:
+        <li>Click "Start".</li>
+        <li>Do the scroll (mousewheel, fling, arrow click etc).</li>
+        <li>Click "Stop".</li>
+      </ul>
+      <button id="toggleButton" onclick="toggleRecordState()">Start</button>
+      <div>
+        Scroll delta: <span id="scrollDiv">0</span><br />
+        rAF(s) that see the offset change: <span id="rAFDiv">0</span>
+      </div>
+      <div class="container" style="width: 70vw; height: 60vh;">
+        <div><canvas id="graph_visual"></canvas></div>
+      </div>
+      </div>
     </div>
-    </div>
-  </div>
-  </div>
   <div style="height: 50000px; width: 500vw;"></div>
 </body>
 </html>
