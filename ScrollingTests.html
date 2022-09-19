@@ -105,10 +105,13 @@
       }
 
       function toggleanimations() {
+        var fps_div = document.getElementById("fpscounter");
         var animations_div = document.getElementById("animations");
         if (animations_div.style.display === "none") {
+          fps_div.style.display = "block";
           animations_div.style.display = "block";
         } else {
+          fps_div.style.display = "none";
           animations_div.style.display = "none";
         }
       }
@@ -229,7 +232,7 @@
       Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
       ScrollTop:  <span id="scrolly">0</span><br />
       ScrollLeft: <span id="scrollx">0</span><br />
-      FPS: <span id="fps">0</span><br />
+      <span id="fpscounter">FPS: <span id="fps">0</span></span><br />
       <button onclick="startIntermittentHangs()">Induce main thread jank.</button>
       <button onclick="stopHangs()">Stop jank.</button><br />
       <button onclick="toggleanimations()">Toggle animations visibility.</button><br /><br />
