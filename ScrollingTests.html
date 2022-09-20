@@ -104,14 +104,16 @@
         g_intervalHandle = setInterval(hang, hangInterval);
       }
 
-      function toggleanimations() {
+      function togglefpscounter() {
         var fps_div = document.getElementById("fpscounter");
+        fps_div.style.display = fps_div.style.display === "none" ? "block" : "none";
+      }
+
+      function toggleanimations() {
         var animations_div = document.getElementById("animations");
         if (animations_div.style.display === "none") {
-          fps_div.style.display = "block";
           animations_div.style.display = "block";
         } else {
-          fps_div.style.display = "none";
           animations_div.style.display = "none";
         }
       }
@@ -229,13 +231,17 @@
   </head>
   <body onscroll="onscrollhandler(event);" onload="fireJSAnimations();">
     <div style="position: fixed; left:0px; right:0px; padding: 10px;">
-      Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
-      ScrollTop:  <span id="scrolly">0</span><br />
-      ScrollLeft: <span id="scrollx">0</span><br />
-      <span id="fpscounter">FPS: <span id="fps">0</span></span><br />
       <button onclick="startIntermittentHangs()">Induce main thread jank.</button>
       <button onclick="stopHangs()">Stop jank.</button><br />
-      <button onclick="toggleanimations()">Toggle animations visibility.</button><br /><br />
+      <button onclick="toggleanimations()">Toggle animations visibility.</button>
+      <button onclick="togglefpscounter()">Toggle FPS counter.</button><br /><br />
+      <div style="width:300px; height:100px;">
+        Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
+        ScrollTop:  <span id="scrolly">0</span><br />
+        ScrollLeft: <span id="scrollx">0</span><br />
+        <span id="fpscounter">FPS: <span id="fps">0</span></span><br />
+      </div>
+      <hr style="height:5px; background-color:#000" />
       <div id="animations">
         CSS (Main thread) animation.
         <div id="expander" style="height:100px;width:150px;border: 5px solid;"></div><br /><br />
