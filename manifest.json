@@ -1,0 +1,16 @@
+{
+  "background_color": "#ffffff",
+  "description": "Test for input types",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "rahul8805.github",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "rahul8805.github",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "categories": [],
+  "screenshots": [],
+  "icons": [],
+  "shortcuts": []
+}

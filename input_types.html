@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+  <link rel="manifest" href="/manifest.json">
   <style>
   .divstyle {
     xmargin-left: 100px;
@@ -9,6 +10,11 @@
     border: 1px solid red;
   }
   </style>
+  <script>
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    }
+  </script>
   </head>
   <body>
   </div><br /><br />
