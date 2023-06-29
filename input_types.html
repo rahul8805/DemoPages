@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="/DemoPages/manifest.json">
   <style>
   .divstyle {
     xmargin-left: 100px;
@@ -12,7 +12,7 @@
   </style>
   <script>
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      navigator.serviceWorker.register('/DemoPages/sw.js', { scope: '/DemoPages/' });
     }
   </script>
   </head>
