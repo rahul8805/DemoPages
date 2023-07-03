@@ -3,6 +3,6 @@ window.onload = () => {
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-             .register('./sw.js');
+             .register('https://rahul8805.github.io/DemoPages/PWA/sw.js');
   }
 }
