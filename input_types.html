@@ -1,69 +1,72 @@
 <!DOCTYPE html>
 <html onpointermove="onpointermovehandler(event);">
   <head>INKING DEMO.
-  <style>
-  .divstyle {
-    xmargin-left: 100px;
-    height: 50px;
-    width: 200px;
-    border: 1px solid red;
-  }
-  </style>
-  <script>
-    function onpointermovehandler(event) {
-      var pageX = Math.round(event.pageX);
-      var pageY = Math.round(event.pageY);
-      document.getElementById("x").innerHTML = pageX;
-      document.getElementById("y").innerHTML = pageY;
-    }
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <style>
+      .divstyle {
+        height: 50px;
+        width: 200px;
+        border: 1px solid red;
+      }
+    </style>
+    <script>
+      function onpointermovehandler(event) {
+        var pageX = Math.round(event.pageX);
+        var pageY = Math.round(event.pageY);
+        document.getElementById("x").innerHTML = pageX;
+        document.getElementById("y").innerHTML = pageY;
+      }
 
-    // Hang for "hangTime" after every "hangInterval"
-    var hangTime = 0;
-    var hangInterval = 500;
-    var g_intervalHandle;
-    function stopHangs() {
-      clearInterval(g_intervalHandle);
-    }
+      // Hang for "hangTime" after every "hangInterval"
+      var hangTime = 0;
+      var hangInterval = 500;
+      var g_intervalHandle;
 
-    function hang() {
-      var now = (new Date()).getTime();
+      function stopHangs() {
+        clearInterval(g_intervalHandle);
+      }
 
-      for (;;) {
-        if((new Date()).getTime() - now > hangTime) {
-          break;
+      function hang() {
+        var now = (new Date()).getTime();
+
+        for (;;) {
+          if((new Date()).getTime() - now > hangTime) {
+            break;
+          }
         }
       }
-    }
 
-    function startIntermittentHangs() {
-      if(hangTime == 0)
-        return;
+      function startIntermittentHangs() {
+        if(hangTime == 0)
+          return;
+        g_intervalHandle = setInterval(hang, hangInterval);
+      }
 
-      g_intervalHandle = setInterval(hang, hangInterval);
-    }
+      function updateJank() {
+        stopHangs();
+        var step_value = 100;
+        hangTime = document.getElementById("slider").value * step_value;
+        document.getElementById("hangmsg").innerHTML = hangTime;
+        startIntermittentHangs();
+      }
 
-    function updateJank() {
-      stopHangs();
-      var step_value = 100;
-      hangTime = document.getElementById("slider").value * step_value;
-      document.getElementById("hangmsg").innerHTML = hangTime;
-      startIntermittentHangs();
-    }
+      // Main thread animation for reference.
+      var rotate_deg = 0;
+      function rotateImage() {
+        var r = document.getElementById('rotatorJS');
+        r.style.transform = 'rotate('+((rotate_deg++)%360)+'deg)';
+        window.requestAnimationFrame(rotateImage);
+      }
 
-    // Main thread animation for reference.
-    var rotate_deg = 0;
-    function rotateImage() {
-      var r = document.getElementById('rotatorJS');
-      r.style.transform = 'rotate('+((rotate_deg++)%360)+'deg)';
-      window.requestAnimationFrame(rotateImage);
-    }
-
-    function onloadhandler() {
-      stopHangs();
-      window.requestAnimationFrame(rotateImage);
-      document.getElementById("hangint").innerHTML = hangInterval;
-    }
-  </script>
+      function onloadhandler() {
+        stopHangs();
+        window.requestAnimationFrame(rotateImage);
+        document.getElementById("hangint").innerHTML = hangInterval;
+      }
+    </script>
   </head>
   <body onload="onloadhandler()">
     <br /><br />
