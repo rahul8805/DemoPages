@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html onpointermove="onpointermovehandler(event);">
   <head>INKING DEMO.
-  <link rel="canonical" href="https://rahul8805.github.io/DemoPages/manifest.json">
   <style>
   .divstyle {
     xmargin-left: 100px;
@@ -11,26 +10,81 @@
   }
   </style>
   <script>
-    if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/DemoPages/sw.js', { scope: '/DemoPages/' });
+    function onpointermovehandler(event) {
+      var pageX = Math.round(event.pageX);
+      var pageY = Math.round(event.pageY);
+      document.getElementById("x").innerHTML = pageX;
+      document.getElementById("y").innerHTML = pageY;
+    }
+
+    // Hang for "hangTime" after every "hangInterval"
+    var hangTime = 0;
+    var hangInterval = 500;
+    var g_intervalHandle;
+    function stopHangs() {
+      clearInterval(g_intervalHandle);
+    }
+
+    function hang() {
+      var now = (new Date()).getTime();
+
+      for (;;) {
+        if((new Date()).getTime() - now > hangTime) {
+          break;
+        }
+      }
+    }
+
+    function startIntermittentHangs() {
+      if(hangTime == 0)
+        return;
+
+      g_intervalHandle = setInterval(hang, hangInterval);
+    }
+
+    function updateJank() {
+      stopHangs();
+      var step_value = 100;
+      hangTime = document.getElementById("slider").value * step_value;
+      document.getElementById("hangmsg").innerHTML = hangTime;
+      startIntermittentHangs();
+    }
+
+    // Main thread animation for reference.
+    var rotate_deg = 0;
+    function rotateImage() {
+      var r = document.getElementById('rotatorJS');
+      r.style.transform = 'rotate('+((rotate_deg++)%360)+'deg)';
+      window.requestAnimationFrame(rotateImage);
+    }
+
+    function onloadhandler() {
+      stopHangs();
+      window.requestAnimationFrame(rotateImage);
+      document.getElementById("hangint").innerHTML = hangInterval;
     }
   </script>
   </head>
-  <body>
-  <br /><br />
-  textarea<br />
+  <body onload="onloadhandler()">
+    <br /><br />
+    Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br /><br />
+    Hang the main thread for <span id="hangmsg">0</span> ms every <span id="hangint">0</span> ms.<br />
+	<input type="range" min="0" step="1" max="10" value="0" id="slider" oninput="updateJank()"><br /><br />
+    Main JS thread animation (mostly exists so that you can visually see the jank).<br />
+    <div id="rotatorJS"  style="height:100px;width:100px;border: 5px solid;" onclick="rotateImage()"></div>
+    <br /><br />
+    textarea<br />
     <textarea rows="4" cols="50"></textarea><br /><br />
-  textarea (handwriting="false")<br />
+    textarea (handwriting="false")<br />
     <textarea handwriting="false" rows="4" cols="50"></textarea><br /><br />
-  contenteditable<br />
-  <div contenteditable="true" class="divstyle">
-  </div><br />
+    contenteditable<br />
+    <div contenteditable="true" class="divstyle">
+    </div><br />
     <span>Input type text: </span><input type="text">
     <br /><br /><span>Input type email: </span><input type="email">
     <br /><br /><span>Input type search: </span><input type="search">
     <br /><br /><span>Input type tel: </span><input type="tel">
     <br /><br /><span>Input type url: </span><input type="url">
-  <div style="width: 1000vw; height: 1000vh;">
-  </div>
+  <div style="width: 1000vw; height: 1000vh;"></div>
   </body>
 </html>
