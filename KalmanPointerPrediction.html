@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <style>
+    html, body, div, canvas {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+    <script>
+      var ctx;
+      window.addEventListener("pointermove", function(event) {
+
+        document.getElementById("x").innerHTML = event.pageX;
+        document.getElementById("y").innerHTML = event.pageY;
+
+        console.log("Coalesced -> ");
+		for (let e of event.getCoalescedEvents()) {
+          console.log("(" + e.pageX + ", " + e.pageY + ")");
+          drawCoordinates(e.pageX, e.pageY, "#00ff00");
+        }
+
+        var predicted_points = event.getPredictedEvents();
+		if(predicted_points.length > 0) {
+          console.log("Predicted -> ");
+          for (let e of predicted_points) {
+            console.log("(" + e.pageX + ", " + e.pageY + ")");
+            drawCoordinates(e.pageX, e.pageY, "#ff0000");
+          }
+        }
+      });
+
+      function drawCoordinates(x, y, color){
+        var pointSize = 3; // Change according to the size of the point.
+        ctx.fillStyle = color;
+
+        ctx.beginPath(); //Start path
+        ctx.arc(x, y, pointSize, 0, Math.PI * 2, true); // Draw a point using the arc function of the canvas with a point structure.
+        ctx.fill(); // Close the path and fill.
+      }
+
+      function onloadHandler() {
+        // Create a canvas that extends the entire screen
+        // and it will draw right over the other html elements, like buttons, etc
+        var canvas = document.createElement("canvas");
+        canvas.setAttribute("width", window.innerWidth);
+        canvas.setAttribute("height", window.innerHeight);
+        canvas.setAttribute("style", "position: fixed; left:0px; right:0px;");
+        document.body.appendChild(canvas);
+        ctx = canvas.getContext("2d");
+      }
+    </script>
+  </head>
+  <body onload="onloadHandler()">
+    <div style="position: fixed; left:0px; right:0px">
+	  Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)
+    </div>
+  </body>
+</html>
