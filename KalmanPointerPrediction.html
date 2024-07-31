@@ -9,15 +9,20 @@
   </style>
     <script>
       var ctx;
+      var captured = false;;
       window.addEventListener("pointermove", function(event) {
 
-        document.getElementById("x").innerHTML = event.pageX;
-        document.getElementById("y").innerHTML = event.pageY;
+        document.getElementById("x").innerHTML = Math.floor(event.pageX);
+        document.getElementById("y").innerHTML = Math.floor(event.pageY);
 
+        if(!captured)
+          return;
+
+        console.log("***************next***************");
         console.log("Coalesced -> ");
 		for (let e of event.getCoalescedEvents()) {
           console.log("(" + e.pageX + ", " + e.pageY + ")");
-          drawCoordinates(e.pageX, e.pageY, "#00ff00");
+          drawCoordinates(e.pageX, e.pageY, "#00ff00", 6);
         }
 
         var predicted_points = event.getPredictedEvents();
@@ -25,18 +30,26 @@
           console.log("Predicted -> ");
           for (let e of predicted_points) {
             console.log("(" + e.pageX + ", " + e.pageY + ")");
-            drawCoordinates(e.pageX, e.pageY, "#ff0000");
+            drawCoordinates(e.pageX, e.pageY, "#ff0000", 3);
           }
         }
+
+        drawCoordinates(event.pageX, event.pageY, "#0000ff", 12);
       });
 
-      function drawCoordinates(x, y, color){
-        var pointSize = 3; // Change according to the size of the point.
-        ctx.fillStyle = color;
+      window.addEventListener("pointerdown", function(event) {
+        captured = true;
+      });
 
-        ctx.beginPath(); //Start path
-        ctx.arc(x, y, pointSize, 0, Math.PI * 2, true); // Draw a point using the arc function of the canvas with a point structure.
-        ctx.fill(); // Close the path and fill.
+      window.addEventListener("pointerup", function(event) {
+        captured = false;
+      });
+
+      function drawCoordinates(x, y, color, pointSize){
+        ctx.beginPath();
+        ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+        ctx.strokeStyle = color;
+        ctx.stroke();
       }
 
       function onloadHandler() {
@@ -53,7 +66,10 @@
   </head>
   <body onload="onloadHandler()">
     <div style="position: fixed; left:0px; right:0px">
-	  Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)
+      Event coalescing and prediction demo<br />
+      Try pointerdown -> pointermove -> pointerup<br /><br />
+      Info: Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
+      (Optional: See console log for even more details on predicted event coords)
     </div>
   </body>
 </html>
