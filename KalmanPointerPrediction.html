@@ -9,14 +9,10 @@
   </style>
     <script>
       var ctx;
-      var captured = false;;
       window.addEventListener("pointermove", function(event) {
 
         document.getElementById("x").innerHTML = Math.floor(event.pageX);
         document.getElementById("y").innerHTML = Math.floor(event.pageY);
-
-        if(!captured)
-          return;
 
         console.log("***************next***************");
         console.log("Coalesced -> ");
@@ -35,14 +31,6 @@
         }
 
         drawCoordinates(event.pageX, event.pageY, "#0000ff", 12);
-      });
-
-      window.addEventListener("pointerdown", function(event) {
-        captured = true;
-      });
-
-      window.addEventListener("pointerup", function(event) {
-        captured = false;
       });
 
       function drawCoordinates(x, y, color, pointSize){
@@ -69,7 +57,10 @@
       Event coalescing and prediction demo<br />
       Try pointerdown -> pointermove -> pointerup<br /><br />
       Info: Pointer co-ordinates: (<span id="x">0</span>, <span id="y">0</span>)<br />
-      (Optional: See console log for even more details on predicted event coords)
+      (Optional: See console log for even more details on predicted event coords)<br /><br />
+      <span style="color:#00ff00">Green</span>: Events that are being coalesced.<br />
+      <span style="color:#0000ff">Blue</span>: Coalesced event.<br />
+      <span style="color:#ff0000">Red</span>: Predicted events.<br />
     </div>
   </body>
 </html>
